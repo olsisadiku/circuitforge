@@ -5,7 +5,7 @@
 
 import { Action2, registerAction2 } from '../../../../../platform/actions/common/actions.js';
 import { ServicesAccessor } from '../../../../../platform/instantiation/common/instantiation.js';
-import { localize } from '../../../../../nls.js';
+import { localize2 } from '../../../../../nls.js';
 import {
 	CIRCUITFORGE_EXPORT_BOM_CSV_COMMAND_ID,
 	CIRCUITFORGE_EXPORT_BOM_JSON_COMMAND_ID,
@@ -17,7 +17,7 @@ registerAction2(class ExportBomCsvAction extends Action2 {
 	constructor() {
 		super({
 			id: CIRCUITFORGE_EXPORT_BOM_CSV_COMMAND_ID,
-			title: localize('circuitforge.exportBomCsv', 'CircuitForge: Export BOM as CSV'),
+			title: localize2('circuitforge.exportBomCsv', 'CircuitForge: Export BOM as CSV'),
 			f1: true,
 		});
 	}
@@ -34,7 +34,7 @@ registerAction2(class ExportBomJsonAction extends Action2 {
 	constructor() {
 		super({
 			id: CIRCUITFORGE_EXPORT_BOM_JSON_COMMAND_ID,
-			title: localize('circuitforge.exportBomJson', 'CircuitForge: Export BOM as JSON'),
+			title: localize2('circuitforge.exportBomJson', 'CircuitForge: Export BOM as JSON'),
 			f1: true,
 		});
 	}
@@ -51,7 +51,7 @@ registerAction2(class ExportDiagramSvgAction extends Action2 {
 	constructor() {
 		super({
 			id: CIRCUITFORGE_EXPORT_DIAGRAM_SVG_COMMAND_ID,
-			title: localize('circuitforge.exportDiagramSvg', 'CircuitForge: Export Diagram as SVG'),
+			title: localize2('circuitforge.exportDiagramSvg', 'CircuitForge: Export Diagram as SVG'),
 			f1: true,
 		});
 	}

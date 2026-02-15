@@ -20,15 +20,15 @@ export const CIRCUITFORGE_EXPORT_DIAGRAM_SVG_COMMAND_ID = 'circuitforge.exportDi
 
 // Configuration keys
 export const CIRCUITFORGE_CONFIG_SECTION = 'circuitforge';
-export const CIRCUITFORGE_API_KEY_CONFIG = 'circuitforge.claudeApiKey';
+export const CIRCUITFORGE_API_KEY_CONFIG = 'circuitforge.openaiApiKey';
 export const CIRCUITFORGE_MODEL_CONFIG = 'circuitforge.model';
 
 // Defaults
-export const DEFAULT_MODEL = 'claude-sonnet-4-5-20250929';
+export const DEFAULT_MODEL = 'gpt-4o';
 export const BREADBOARD_ROWS = 63;
 export const BREADBOARD_COLS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
 
-// System prompt for Claude API
+// System prompt for OpenAI API
 export const HARDWARE_DESIGN_SYSTEM_PROMPT = `You are an expert hardware engineer specializing in Arduino and ESP32 microcontroller projects. When designing a hardware project:
 
 1. COMPONENTS: Use common, widely-available components. Always include ALL necessary passive components:
@@ -57,11 +57,13 @@ export const HARDWARE_DESIGN_SYSTEM_PROMPT = `You are an expert hardware enginee
 
 5. PRICING: Provide realistic estimated prices in USD for individual components from common retailers.`;
 
-// Tool definition for Claude API structured output
+// Tool definition for OpenAI function calling
 export const HARDWARE_DESIGN_TOOL_DEFINITION = {
-	name: 'generate_hardware_design',
-	description: 'Generate a complete hardware design with bill of materials and wiring diagram for a breadboard-based Arduino/ESP32 project.',
-	input_schema: {
+	type: 'function' as const,
+	function: {
+		name: 'generate_hardware_design',
+		description: 'Generate a complete hardware design with bill of materials and wiring diagram for a breadboard-based Arduino/ESP32 project.',
+		parameters: {
 		type: 'object' as const,
 		properties: {
 			projectTitle: {
@@ -167,6 +169,7 @@ export const HARDWARE_DESIGN_TOOL_DEFINITION = {
 			}
 		},
 		required: ['projectTitle', 'description', 'bom', 'wiring', 'warnings']
+		}
 	}
 };
 

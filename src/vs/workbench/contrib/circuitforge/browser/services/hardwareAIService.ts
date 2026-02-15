@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *  CircuitForge — AI Hardware Design Studio
- *  Hardware AI Service — Claude API integration with structured tool use.
+ *  Hardware AI Service — OpenAI API integration with function calling.
  *--------------------------------------------------------------------------------------------*/
 
 import { createDecorator } from '../../../../../platform/instantiation/common/instantiation.js';
@@ -55,23 +55,33 @@ export class HardwareAIService extends Disposable implements IHardwareAIService 
 		const apiKey = this.configurationService.getValue<string>(CIRCUITFORGE_API_KEY_CONFIG);
 
 		if (!apiKey) {
+			console.warn('[CircuitForge][AI] No API key configured, falling back to sample data');
 			this.notificationService.notify({
 				severity: Severity.Error,
-				message: 'CircuitForge: Please configure your Claude API key in Settings (circuitforge.claudeApiKey) to generate hardware designs.',
+				message: 'CircuitForge: Please configure your OpenAI API key in Settings (circuitforge.openaiApiKey) to generate hardware designs.',
 			});
 			// Fall back to sample data for development/demo
 			return this.generateWithSampleData(idea);
 		}
 
+		console.log(`[CircuitForge][AI] API key found (${apiKey.slice(0, 8)}...), starting generation`);
 		this._isGenerating = true;
 		this._onDidStartGeneration.fire();
 
 		try {
-			const result = await this.callClaudeAPI(apiKey, idea);
+			const result = await this.callOpenAIAPI(apiKey, idea);
+			console.log('[CircuitForge][AI] API call succeeded:', {
+				title: result.projectTitle,
+				bomCount: result.bom.length,
+				componentCount: result.wiring.components.length,
+				connectionCount: result.wiring.connections.length,
+				warnings: result.warnings.length,
+			});
 			this._onDidCompleteGeneration.fire(result);
 			return result;
 		} catch (err) {
 			const message = err instanceof Error ? err.message : 'Unknown error occurred';
+			console.error('[CircuitForge][AI] Generation failed:', message, err);
 			this._onDidFailGeneration.fire(message);
 			this.notificationService.notify({
 				severity: Severity.Error,
@@ -83,37 +93,43 @@ export class HardwareAIService extends Disposable implements IHardwareAIService 
 		}
 	}
 
-	private async callClaudeAPI(apiKey: string, idea: string): Promise<HardwareDesignResult> {
+	private async callOpenAIAPI(apiKey: string, idea: string): Promise<HardwareDesignResult> {
 		const model = this.configurationService.getValue<string>(CIRCUITFORGE_MODEL_CONFIG) || DEFAULT_MODEL;
+		console.log(`[CircuitForge][AI] Calling OpenAI API — model: ${model}`);
 
 		const requestBody = {
 			model,
 			max_tokens: 8192,
-			system: HARDWARE_DESIGN_SYSTEM_PROMPT,
-			tools: [HARDWARE_DESIGN_TOOL_DEFINITION],
-			tool_choice: { type: 'tool', name: 'generate_hardware_design' },
 			messages: [
+				{
+					role: 'system',
+					content: HARDWARE_DESIGN_SYSTEM_PROMPT
+				},
 				{
 					role: 'user',
 					content: `Design a complete hardware project for: "${idea}"\n\nProvide a full bill of materials and breadboard wiring diagram. Use common Arduino/ESP32 components. Include ALL necessary passive components (resistors, capacitors, etc.).`
 				}
-			]
+			],
+			tools: [HARDWARE_DESIGN_TOOL_DEFINITION],
+			tool_choice: { type: 'function' as const, function: { name: 'generate_hardware_design' } },
 		};
 
-		const response = await fetch('https://api.anthropic.com/v1/messages', {
+		const response = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-api-key': apiKey,
-				'anthropic-version': '2023-06-01',
+				'Authorization': `Bearer ${apiKey}`,
 			},
 			body: JSON.stringify(requestBody),
 		});
 
+		console.log(`[CircuitForge][AI] API response status: ${response.status}`);
+
 		if (!response.ok) {
 			const errorBody = await response.text();
+			console.error(`[CircuitForge][AI] API error body:`, errorBody);
 			if (response.status === 401) {
-				throw new Error('Invalid API key. Please check your CircuitForge API key in Settings.');
+				throw new Error('Invalid API key. Please check your OpenAI API key in Settings.');
 			}
 			if (response.status === 429) {
 				throw new Error('Rate limit exceeded. Please wait a moment and try again.');
@@ -122,15 +138,25 @@ export class HardwareAIService extends Disposable implements IHardwareAIService 
 		}
 
 		const data = await response.json();
+		console.log(`[CircuitForge][AI] API response received — usage: ${JSON.stringify(data.usage || {})}`);
 
-		// Extract the tool use result from Claude's response
-		const toolUseBlock = data.content?.find((block: { type: string }) => block.type === 'tool_use');
-		if (!toolUseBlock || toolUseBlock.name !== 'generate_hardware_design') {
-			throw new Error('Unexpected API response format — no tool use block found.');
+		// Extract the function call from OpenAI's response
+		const message = data.choices?.[0]?.message;
+		const toolCall = message?.tool_calls?.[0];
+		if (!toolCall || toolCall.function?.name !== 'generate_hardware_design') {
+			console.error('[CircuitForge][AI] Unexpected response — no function call found. Message:', JSON.stringify(message).slice(0, 500));
+			throw new Error('Unexpected API response format — no function call found.');
 		}
 
-		const designInput = toolUseBlock.input;
-		return this.parseDesignResult(designInput);
+		console.log(`[CircuitForge][AI] Parsing function call arguments (${toolCall.function.arguments.length} chars)`);
+		try {
+			const designInput = JSON.parse(toolCall.function.arguments);
+			return this.parseDesignResult(designInput);
+		} catch (parseErr) {
+			console.error('[CircuitForge][AI] Failed to parse function arguments:', parseErr);
+			console.error('[CircuitForge][AI] Raw arguments:', toolCall.function.arguments.slice(0, 1000));
+			throw new Error(`Failed to parse AI response: ${parseErr instanceof Error ? parseErr.message : parseErr}`);
+		}
 	}
 
 	private parseDesignResult(input: Record<string, unknown>): HardwareDesignResult {
@@ -151,11 +177,13 @@ export class HardwareAIService extends Disposable implements IHardwareAIService 
 	}
 
 	private generateWithSampleData(_idea: string): HardwareDesignResult {
+		console.log('[CircuitForge][AI] Using sample data (no API key)');
 		this._isGenerating = true;
 		this._onDidStartGeneration.fire();
 
 		// Return sample data after a brief simulated delay
 		const result = { ...SAMPLE_DESIGN_RESULT };
+		console.log(`[CircuitForge][AI] Sample data: "${result.projectTitle}" — ${result.bom.length} BOM items, ${result.wiring.components.length} placements, ${result.wiring.connections.length} wires`);
 		this._onDidCompleteGeneration.fire(result);
 		this._isGenerating = false;
 		return result;

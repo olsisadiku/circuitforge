@@ -17,11 +17,11 @@ import { scrollbarShadow, badgeBackground } from './miscColors.js';
 // ----- editor
 
 export const editorBackground = registerColor('editor.background',
-	{ light: '#ffffff', dark: '#1E1E1E', hcDark: Color.black, hcLight: Color.white },
+	{ light: '#ffffff', dark: '#131920', hcDark: Color.black, hcLight: Color.white },
 	nls.localize('editorBackground', "Editor background color."));
 
 export const editorForeground = registerColor('editor.foreground',
-	{ light: '#333333', dark: '#BBBBBB', hcDark: Color.white, hcLight: foreground },
+	{ light: '#333333', dark: '#D4DDE8', hcDark: Color.white, hcLight: foreground },
 	nls.localize('editorForeground', "Editor default foreground color."));
 
 
@@ -43,7 +43,7 @@ export const editorStickyScrollShadow = registerColor('editorStickyScroll.shadow
 
 
 export const editorWidgetBackground = registerColor('editorWidget.background',
-	{ dark: '#252526', light: '#F3F3F3', hcDark: '#0C141F', hcLight: Color.white },
+	{ dark: '#1A2332', light: '#F3F3F3', hcDark: '#0C141F', hcLight: Color.white },
 	nls.localize('editorWidgetBackground', 'Background color of editor widgets, such as find/replace.'));
 
 export const editorWidgetForeground = registerColor('editorWidget.foreground',

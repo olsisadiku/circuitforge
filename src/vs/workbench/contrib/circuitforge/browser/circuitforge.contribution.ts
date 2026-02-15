@@ -119,21 +119,21 @@ Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Configuration)
 		title: localize('circuitforgeConfig', 'CircuitForge'),
 		type: 'object',
 		properties: {
-			'circuitforge.claudeApiKey': {
+			'circuitforge.openaiApiKey': {
 				type: 'string',
 				default: '',
-				markdownDescription: localize('circuitforge.claudeApiKey', 'Your Claude API key for generating hardware designs. Get one from [Anthropic Console](https://console.anthropic.com).'),
+				markdownDescription: localize('circuitforge.openaiApiKey', 'Your OpenAI API key for generating hardware designs. Get one from [OpenAI Platform](https://platform.openai.com/api-keys).'),
 				scope: ConfigurationScope.APPLICATION,
 			},
 			'circuitforge.model': {
 				type: 'string',
-				default: 'claude-sonnet-4-5-20250929',
+				default: 'gpt-4o',
 				enum: [
-					'claude-sonnet-4-5-20250929',
-					'claude-haiku-4-5-20251001',
-					'claude-opus-4-6',
+					'gpt-4o',
+					'gpt-4o-mini',
+					'gpt-4-turbo',
 				],
-				markdownDescription: localize('circuitforge.model', 'The Claude model to use for hardware design generation.'),
+				markdownDescription: localize('circuitforge.model', 'The OpenAI model to use for hardware design generation.'),
 				scope: ConfigurationScope.APPLICATION,
 			},
 		}

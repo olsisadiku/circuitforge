@@ -14,6 +14,7 @@ import { HardwareDesignResult } from '../../common/types.js';
 import { CIRCUITFORGE_DIAGRAM_EDITOR_ID } from '../../common/constants.js';
 import { CancellationToken } from '../../../../../base/common/cancellation.js';
 import { IEditorOptions } from '../../../../../platform/editor/common/editor.js';
+import { IEditorOpenContext } from '../../../../common/editor.js';
 import { Dimension } from '../../../../../base/browser/dom.js';
 import { IWebviewService, IOverlayWebview } from '../../../../contrib/webview/browser/webview.js';
 import { BreadboardRenderer } from '../webview/diagram/breadboardRenderer.js';
@@ -61,10 +62,11 @@ export class DiagramEditorPane extends EditorPane {
 		this.container.style.width = '100%';
 		this.container.style.height = '100%';
 		this.container.style.overflow = 'hidden';
+		this.container.style.position = 'relative';
 		parent.appendChild(this.container);
 	}
 
-	override async setInput(input: EditorInput, options: IEditorOptions | undefined, context: unknown, token: CancellationToken): Promise<void> {
+	override async setInput(input: EditorInput, options: IEditorOptions | undefined, context: IEditorOpenContext, token: CancellationToken): Promise<void> {
 		await super.setInput(input, options, context, token);
 
 		if (input instanceof DiagramEditorInput) {
@@ -73,6 +75,8 @@ export class DiagramEditorPane extends EditorPane {
 	}
 
 	private renderDiagram(result: HardwareDesignResult): void {
+		console.log(`[CircuitForge][Diagram] Rendering diagram for "${result.projectTitle}"`);
+
 		if (this.webview) {
 			this.webview.dispose();
 		}
@@ -85,13 +89,17 @@ export class DiagramEditorPane extends EditorPane {
 				allowScripts: true,
 				localResourceRoots: [],
 			},
+			extension: undefined,
 		});
 
 		this.webview.layoutWebviewOverElement(this.container);
 		this.webview.claim(this, this.window, this.scopedContextKeyService);
 
+		console.log('[CircuitForge][Diagram] Generating SVG...');
 		const svgContent = this.generateDiagramSvg(result);
+		console.log(`[CircuitForge][Diagram] SVG generated (${svgContent.length} chars)`);
 		this.webview.setHtml(this.generateDiagramHtml(svgContent, result));
+		console.log('[CircuitForge][Diagram] HTML set on webview');
 
 		this._register(this.webview.onMessage(e => {
 			if (e.message?.command === 'exportSVG') {
@@ -105,24 +113,38 @@ export class DiagramEditorPane extends EditorPane {
 		const shapes = new ComponentShapes();
 		const router = new WireRouter(result.wiring);
 
+		console.log(`[CircuitForge][Diagram] Board: ${result.wiring.boardRows} rows x ${result.wiring.boardCols.length} cols`);
 		let svg = renderer.renderBoard();
 		svg += renderer.renderPowerRails();
 
 		// Render components
+		console.log(`[CircuitForge][Diagram] Rendering ${result.wiring.components.length} components...`);
 		for (const placement of result.wiring.components) {
 			const bomEntry = result.bom.find(b => b.id === placement.componentId);
 			const shapeName = bomEntry?.svgShapeId || 'generic_module';
-			svg += shapes.render(shapeName, placement, bomEntry?.name || placement.componentId);
+			console.log(`[CircuitForge][Diagram]   Component: "${placement.componentId}" → shape="${shapeName}", row=${placement.row}, col=${placement.col}, span=${placement.span}, orient=${placement.orientation}`);
+			try {
+				svg += shapes.render(shapeName, placement, bomEntry?.name || placement.componentId);
+			} catch (err) {
+				console.error(`[CircuitForge][Diagram]   FAILED to render component "${placement.componentId}":`, err);
+			}
 		}
 
 		// Render wires
+		console.log(`[CircuitForge][Diagram] Rendering ${result.wiring.connections.length} wires...`);
 		for (const connection of result.wiring.connections) {
-			svg += router.renderWire(connection);
+			console.log(`[CircuitForge][Diagram]   Wire: ${connection.from.componentId}.${connection.from.pin} → ${connection.to.componentId}.${connection.to.pin} (${connection.signalType}, ${connection.color})`);
+			try {
+				svg += router.renderWire(connection);
+			} catch (err) {
+				console.error(`[CircuitForge][Diagram]   FAILED to render wire "${connection.id}":`, err);
+			}
 		}
 
 		const { width, height } = renderer.getBoardDimensions();
+		console.log(`[CircuitForge][Diagram] Board dimensions: ${width} x ${height}`);
 		return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"
-			style="background: #2d2d2d;">${svg}</svg>`;
+			style="background: #131920;">${svg}</svg>`;
 	}
 
 	private generateDiagramHtml(svgContent: string, result: HardwareDesignResult): string {
@@ -132,9 +154,9 @@ export class DiagramEditorPane extends EditorPane {
 <style>
 	* { margin: 0; padding: 0; box-sizing: border-box; }
 	body {
-		background: #1e1e1e;
+		background: #131920;
 		overflow: hidden;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	}
 	.toolbar {
 		position: fixed;
@@ -146,25 +168,28 @@ export class DiagramEditorPane extends EditorPane {
 	}
 	.toolbar button {
 		padding: 4px 10px;
-		border: 1px solid #3c3c3c;
-		border-radius: 4px;
-		background: #2d2d2d;
-		color: #ccc;
+		border: 1px solid #2A3544;
+		border-radius: 6px;
+		background: #1A2332;
+		color: #D4DDE8;
 		cursor: pointer;
 		font-size: 11px;
+		backdrop-filter: blur(8px);
+		transition: background 0.15s ease, border-color 0.15s ease;
 	}
-	.toolbar button:hover { background: #3c3c3c; }
+	.toolbar button:hover { background: #1E3A2F; border-color: #00D47E; }
 	.legend {
 		position: fixed;
 		bottom: 8px;
 		left: 8px;
 		z-index: 100;
-		background: rgba(30,30,30,0.9);
-		border: 1px solid #3c3c3c;
-		border-radius: 4px;
+		background: rgba(13,17,23,0.92);
+		border: 1px solid #2A3544;
+		border-radius: 8px;
 		padding: 8px 12px;
 		font-size: 10px;
-		color: #ccc;
+		color: #D4DDE8;
+		backdrop-filter: blur(8px);
 	}
 	.legend-item {
 		display: flex;
@@ -182,12 +207,13 @@ export class DiagramEditorPane extends EditorPane {
 		bottom: 8px;
 		right: 8px;
 		z-index: 100;
-		background: rgba(30,30,30,0.9);
-		border: 1px solid #3c3c3c;
-		border-radius: 4px;
+		background: rgba(13,17,23,0.92);
+		border: 1px solid #2A3544;
+		border-radius: 6px;
 		padding: 4px 8px;
 		font-size: 10px;
-		color: #888;
+		color: #6B7B8D;
+		backdrop-filter: blur(8px);
 	}
 	#canvas {
 		width: 100%;
@@ -204,7 +230,7 @@ export class DiagramEditorPane extends EditorPane {
 	}
 	/* Hover interactions via CSS */
 	svg .component-group:hover { filter: brightness(1.2); }
-	svg .component-group:hover .component-body { stroke: #569cd6; stroke-width: 2; }
+	svg .component-group:hover .component-body { stroke: #00D47E; stroke-width: 2; }
 	svg .wire-path:hover { stroke-width: 3; filter: brightness(1.3); }
 </style>
 </head>
@@ -217,7 +243,7 @@ export class DiagramEditorPane extends EditorPane {
 	</div>
 
 	<div class="legend">
-		<div style="font-weight:600; margin-bottom:4px;">${escapeH(result.projectTitle)}</div>
+		<div style="font-weight:600; margin-bottom:4px; color:#00D47E;">${escapeH(result.projectTitle)}</div>
 		<div class="legend-item"><div class="legend-color" style="background:#ff3333;"></div> Power (VCC)</div>
 		<div class="legend-item"><div class="legend-color" style="background:#333333;border:1px solid #666;"></div> Ground (GND)</div>
 		<div class="legend-item"><div class="legend-color" style="background:#4488ff;"></div> Digital Signal</div>
@@ -308,7 +334,8 @@ export class DiagramEditorPane extends EditorPane {
 	}
 
 	override layout(dimension: Dimension): void {
-		super.layout(dimension);
+		this.container.style.width = `${dimension.width}px`;
+		this.container.style.height = `${dimension.height}px`;
 		if (this.webview) {
 			this.webview.layoutWebviewOverElement(this.container);
 		}

@@ -40,6 +40,7 @@ export class ComponentDatabaseService extends Disposable implements IComponentDa
 			}
 			this.aliasMap.set(entry.name.toLowerCase(), entry.id);
 		}
+		console.log(`[CircuitForge][DB] Loaded ${this.components.size} components, ${this.aliasMap.size} aliases`);
 	}
 
 	getAll(): ComponentDatabaseEntry[] {
@@ -92,9 +93,11 @@ export class ComponentDatabaseService extends Disposable implements IComponentDa
 		return bom.map(component => {
 			const dbEntry = this.findById(component.id) || this.fuzzyMatch(component.name);
 			if (!dbEntry) {
+				console.warn(`[CircuitForge][DB] No database match for BOM component: id="${component.id}", name="${component.name}"`);
 				return component;
 			}
 
+			console.log(`[CircuitForge][DB] Enriched "${component.name}" → shape: ${dbEntry.svgShapeId}, price: $${dbEntry.estimatedPrice}`);
 			return {
 				...component,
 				datasheetUrl: component.datasheetUrl || dbEntry.datasheetUrl,

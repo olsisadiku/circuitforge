@@ -17,7 +17,7 @@ import { editorWidgetBackground } from './editorColors.js';
 // ----- input
 
 export const inputBackground = registerColor('input.background',
-	{ dark: '#3C3C3C', light: Color.white, hcDark: Color.black, hcLight: Color.white },
+	{ dark: '#1A2332', light: Color.white, hcDark: Color.black, hcLight: Color.white },
 	nls.localize('inputBoxBackground', "Input box background."));
 
 export const inputForeground = registerColor('input.foreground',
@@ -25,11 +25,11 @@ export const inputForeground = registerColor('input.foreground',
 	nls.localize('inputBoxForeground', "Input box foreground."));
 
 export const inputBorder = registerColor('input.border',
-	{ dark: null, light: null, hcDark: contrastBorder, hcLight: contrastBorder },
+	{ dark: '#2A3544', light: null, hcDark: contrastBorder, hcLight: contrastBorder },
 	nls.localize('inputBoxBorder', "Input box border."));
 
 export const inputActiveOptionBorder = registerColor('inputOption.activeBorder',
-	{ dark: '#007ACC', light: '#007ACC', hcDark: contrastBorder, hcLight: contrastBorder },
+	{ dark: '#00D47E', light: '#007ACC', hcDark: contrastBorder, hcLight: contrastBorder },
 	nls.localize('inputBoxActiveOptionBorder', "Border color of activated options in input fields."));
 
 export const inputActiveOptionHoverBackground = registerColor('inputOption.hoverBackground',
@@ -110,7 +110,7 @@ export const selectBorder = registerColor('dropdown.border',
 // ------ button
 
 export const buttonForeground = registerColor('button.foreground',
-	Color.white,
+	{ dark: Color.fromHex('#0D1117'), light: Color.white, hcDark: Color.white, hcLight: Color.fromHex('#0D1117') },
 	nls.localize('buttonForeground', "Button foreground color."));
 
 export const buttonSeparator = registerColor('button.separator',
@@ -118,7 +118,7 @@ export const buttonSeparator = registerColor('button.separator',
 	nls.localize('buttonSeparator', "Button separator color."));
 
 export const buttonBackground = registerColor('button.background',
-	{ dark: '#0E639C', light: '#007ACC', hcDark: null, hcLight: '#0F4A85' },
+	{ dark: '#00D47E', light: '#007ACC', hcDark: null, hcLight: '#0F4A85' },
 	nls.localize('buttonBackground', "Button background color."));
 
 export const buttonHoverBackground = registerColor('button.hoverBackground',

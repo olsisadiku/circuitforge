@@ -10,10 +10,11 @@ import { IStorageService } from '../../../../../platform/storage/common/storage.
 import { EditorInput } from '../../../../common/editor/editorInput.js';
 import { IEditorGroup } from '../../../../services/editor/common/editorGroupsService.js';
 import { URI } from '../../../../../base/common/uri.js';
-import { HardwareDesignResult, BOMComponent } from '../../common/types.js';
+import { HardwareDesignResult } from '../../common/types.js';
 import { CIRCUITFORGE_BOM_EDITOR_ID } from '../../common/constants.js';
 import { CancellationToken } from '../../../../../base/common/cancellation.js';
 import { IEditorOptions } from '../../../../../platform/editor/common/editor.js';
+import { IEditorOpenContext } from '../../../../common/editor.js';
 import { Dimension } from '../../../../../base/browser/dom.js';
 import { IWebviewService, IOverlayWebview } from '../../../../contrib/webview/browser/webview.js';
 
@@ -59,10 +60,11 @@ export class BomEditorPane extends EditorPane {
 		this.container.style.width = '100%';
 		this.container.style.height = '100%';
 		this.container.style.overflow = 'hidden';
+		this.container.style.position = 'relative';
 		parent.appendChild(this.container);
 	}
 
-	override async setInput(input: EditorInput, options: IEditorOptions | undefined, context: unknown, token: CancellationToken): Promise<void> {
+	override async setInput(input: EditorInput, options: IEditorOptions | undefined, context: IEditorOpenContext, token: CancellationToken): Promise<void> {
 		await super.setInput(input, options, context, token);
 
 		if (input instanceof BomEditorInput) {
@@ -72,6 +74,8 @@ export class BomEditorPane extends EditorPane {
 	}
 
 	private renderBOM(result: HardwareDesignResult): void {
+		console.log(`[CircuitForge][BOM] Rendering BOM for "${result.projectTitle}" — ${result.bom.length} items`);
+
 		if (this.webview) {
 			this.webview.dispose();
 		}
@@ -84,12 +88,20 @@ export class BomEditorPane extends EditorPane {
 				allowScripts: true,
 				localResourceRoots: [],
 			},
+			extension: undefined,
 		});
 
 		this.webview.layoutWebviewOverElement(this.container);
 		this.webview.claim(this, this.window, this.scopedContextKeyService);
 
+		const totalCostPreview = result.bom.reduce((sum, c) => sum + c.estimatedPrice * c.quantity, 0);
+		console.log(`[CircuitForge][BOM] Total estimated cost: $${totalCostPreview.toFixed(2)}`);
+		for (const c of result.bom) {
+			console.log(`[CircuitForge][BOM]   ${c.id}: "${c.name}" x${c.quantity} @ $${c.estimatedPrice} — shape: ${c.svgShapeId || '(none)'}`);
+		}
+
 		this.webview.setHtml(this.generateBomHtml(result));
+		console.log('[CircuitForge][BOM] HTML set on webview');
 
 		this._register(this.webview.onMessage(e => {
 			if (e.message?.command === 'exportCSV') {
@@ -137,22 +149,22 @@ export class BomEditorPane extends EditorPane {
 <head>
 <style>
 	body {
-		font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+		font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 		font-size: 13px;
-		color: #e0e0e0;
-		background: #1e1e1e;
+		color: #D4DDE8;
+		background: #131920;
 		margin: 0;
 		padding: 20px;
 		line-height: 1.5;
 	}
 	h2 {
-		color: #569cd6;
+		color: #00D47E;
 		font-size: 18px;
 		margin: 0 0 4px 0;
 		font-weight: 600;
 	}
 	.subtitle {
-		color: #888;
+		color: #6B7B8D;
 		font-size: 12px;
 		margin-bottom: 16px;
 	}
@@ -163,15 +175,17 @@ export class BomEditorPane extends EditorPane {
 	}
 	.toolbar button {
 		padding: 5px 12px;
-		border: 1px solid #3c3c3c;
-		border-radius: 4px;
-		background: #2d2d2d;
-		color: #cccccc;
+		border: 1px solid #2A3544;
+		border-radius: 6px;
+		background: #1A2332;
+		color: #D4DDE8;
 		cursor: pointer;
 		font-size: 12px;
+		transition: background 0.15s ease, border-color 0.15s ease;
 	}
 	.toolbar button:hover {
-		background: #3c3c3c;
+		background: #1E3A2F;
+		border-color: #00D47E;
 	}
 	table {
 		width: 100%;
@@ -179,30 +193,31 @@ export class BomEditorPane extends EditorPane {
 		margin-bottom: 16px;
 	}
 	th {
-		background: #2d2d2d;
-		color: #569cd6;
+		background: #1A2332;
+		color: #C78432;
 		padding: 8px 10px;
 		text-align: left;
 		font-weight: 600;
 		font-size: 11px;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		border-bottom: 2px solid #3c3c3c;
+		letter-spacing: 1px;
+		border-bottom: 2px solid #2A3544;
 	}
 	td {
 		padding: 8px 10px;
-		border-bottom: 1px solid #2d2d2d;
+		border-bottom: 1px solid #1E2A36;
 		vertical-align: top;
 	}
 	tr:hover td {
-		background: #252526;
+		background: #1A2332;
 	}
 	.center { text-align: center; }
 	.right { text-align: right; font-variant-numeric: tabular-nums; }
 	.total-row {
-		background: #2d2d2d;
+		background: #1A2332;
+		border: 1px solid #2A3544;
 		padding: 12px;
-		border-radius: 4px;
+		border-radius: 8px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -210,30 +225,30 @@ export class BomEditorPane extends EditorPane {
 		font-weight: 600;
 		margin-bottom: 16px;
 	}
-	.total-price { color: #4ec9b0; font-size: 18px; }
+	.total-price { color: #00D47E; font-size: 18px; }
 	.warnings {
-		background: #332b00;
-		border: 1px solid #665500;
-		border-radius: 4px;
+		background: #2A1F0D;
+		border: 1px solid #E8A317;
+		border-radius: 6px;
 		padding: 12px;
 		margin-bottom: 16px;
 	}
-	.warnings h3 { color: #ffcc00; margin: 0 0 8px 0; font-size: 13px; }
+	.warnings h3 { color: #E8A317; margin: 0 0 8px 0; font-size: 13px; }
 	.warnings ul { margin: 0; padding-left: 20px; }
-	.warnings li { margin: 4px 0; color: #e0cc80; }
-	.link { color: #569cd6; text-decoration: none; font-size: 11px; }
-	.link:hover { text-decoration: underline; }
+	.warnings li { margin: 4px 0; color: #D4A84A; }
+	.link { color: #4BA3C7; text-decoration: none; font-size: 11px; }
+	.link:hover { text-decoration: underline; color: #5BB8DC; }
 	.code-section { margin-top: 16px; }
-	.code-section h3 { color: #569cd6; font-size: 13px; margin: 0 0 8px 0; }
+	.code-section h3 { color: #00D47E; font-size: 13px; margin: 0 0 8px 0; }
 	pre {
-		background: #1a1a1a;
-		border: 1px solid #3c3c3c;
-		border-radius: 4px;
+		background: #0D1117;
+		border: 1px solid #2A3544;
+		border-radius: 6px;
 		padding: 12px;
 		overflow-x: auto;
-		font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+		font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 		font-size: 12px;
-		color: #d4d4d4;
+		color: #D4DDE8;
 	}
 </style>
 </head>
@@ -306,7 +321,8 @@ export class BomEditorPane extends EditorPane {
 	}
 
 	override layout(dimension: Dimension): void {
-		super.layout(dimension);
+		this.container.style.width = `${dimension.width}px`;
+		this.container.style.height = `${dimension.height}px`;
 		if (this.webview) {
 			this.webview.layoutWebviewOverElement(this.container);
 		}

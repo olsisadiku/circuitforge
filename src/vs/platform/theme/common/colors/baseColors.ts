@@ -11,11 +11,11 @@ import { registerColor, transparent } from '../colorUtils.js';
 
 
 export const foreground = registerColor('foreground',
-	{ dark: '#CCCCCC', light: '#616161', hcDark: '#FFFFFF', hcLight: '#292929' },
+	{ dark: '#D4DDE8', light: '#616161', hcDark: '#FFFFFF', hcLight: '#292929' },
 	nls.localize('foreground', "Overall foreground color. This color is only used if not overridden by a component."));
 
 export const disabledForeground = registerColor('disabledForeground',
-	{ dark: '#CCCCCC80', light: '#61616180', hcDark: '#A5A5A5', hcLight: '#7F7F7F' },
+	{ dark: '#4A5568', light: '#61616180', hcDark: '#A5A5A5', hcLight: '#7F7F7F' },
 	nls.localize('disabledForeground', "Overall foreground for disabled elements. This color is only used if not overridden by a component."));
 
 export const errorForeground = registerColor('errorForeground',
@@ -27,11 +27,11 @@ export const descriptionForeground = registerColor('descriptionForeground',
 	nls.localize('descriptionForeground', "Foreground color for description text providing additional information, for example for a label."));
 
 export const iconForeground = registerColor('icon.foreground',
-	{ dark: '#C5C5C5', light: '#424242', hcDark: '#FFFFFF', hcLight: '#292929' },
+	{ dark: '#8B9DB0', light: '#424242', hcDark: '#FFFFFF', hcLight: '#292929' },
 	nls.localize('iconForeground', "The default color for icons in the workbench."));
 
 export const focusBorder = registerColor('focusBorder',
-	{ dark: '#007FD4', light: '#0090F1', hcDark: '#F38518', hcLight: '#006BBD' },
+	{ dark: '#00D47E', light: '#0090F1', hcDark: '#F38518', hcLight: '#006BBD' },
 	nls.localize('focusBorder', "Overall border color for focused elements. This color is only used if not overridden by a component."));
 
 export const contrastBorder = registerColor('contrastBorder',
@@ -50,11 +50,11 @@ export const selectionBackground = registerColor('selection.background',
 // ------ text link
 
 export const textLinkForeground = registerColor('textLink.foreground',
-	{ light: '#006AB1', dark: '#3794FF', hcDark: '#21A6FF', hcLight: '#0F4A85' },
+	{ light: '#006AB1', dark: '#C78432', hcDark: '#21A6FF', hcLight: '#0F4A85' },
 	nls.localize('textLinkForeground', "Foreground color for links in text."));
 
 export const textLinkActiveForeground = registerColor('textLink.activeForeground',
-	{ light: '#006AB1', dark: '#3794FF', hcDark: '#21A6FF', hcLight: '#0F4A85' },
+	{ light: '#006AB1', dark: '#D89542', hcDark: '#21A6FF', hcLight: '#0F4A85' },
 	nls.localize('textLinkActiveForeground', "Foreground color for links in text when clicked on and on mouse hover."));
 
 export const textSeparatorForeground = registerColor('textSeparator.foreground',

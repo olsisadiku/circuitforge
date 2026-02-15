@@ -20,7 +20,7 @@ export function WORKBENCH_BACKGROUND(theme: IColorTheme): Color {
 		case ColorScheme.HIGH_CONTRAST_DARK:
 			return Color.fromHex('#000000');
 		default:
-			return Color.fromHex('#252526');
+			return Color.fromHex('#0D1117');
 	}
 }
 
@@ -33,7 +33,7 @@ export const TAB_ACTIVE_BACKGROUND = registerColor('tab.activeBackground', edito
 export const TAB_UNFOCUSED_ACTIVE_BACKGROUND = registerColor('tab.unfocusedActiveBackground', TAB_ACTIVE_BACKGROUND, localize('tabUnfocusedActiveBackground', "Active tab background color in an unfocused group. Tabs are the containers for editors in the editor area. Multiple tabs can be opened in one editor group. There can be multiple editor groups."));
 
 export const TAB_INACTIVE_BACKGROUND = registerColor('tab.inactiveBackground', {
-	dark: '#2D2D2D',
+	dark: '#0D1117',
 	light: '#ECECEC',
 	hcDark: null,
 	hcLight: null,
@@ -46,7 +46,7 @@ export const TAB_UNFOCUSED_INACTIVE_BACKGROUND = registerColor('tab.unfocusedIna
 //#region Tab Foreground
 
 export const TAB_ACTIVE_FOREGROUND = registerColor('tab.activeForeground', {
-	dark: Color.white,
+	dark: Color.fromHex('#D4DDE8'),
 	light: '#333333',
 	hcDark: Color.white,
 	hcLight: '#292929'
@@ -100,7 +100,7 @@ export const TAB_UNFOCUSED_HOVER_FOREGROUND = registerColor('tab.unfocusedHoverF
 //#region Tab Borders
 
 export const TAB_BORDER = registerColor('tab.border', {
-	dark: '#252526',
+	dark: '#1A2332',
 	light: '#F3F3F3',
 	hcDark: contrastBorder,
 	hcLight: contrastBorder,
@@ -123,7 +123,7 @@ export const TAB_UNFOCUSED_ACTIVE_BORDER = registerColor('tab.unfocusedActiveBor
 }, localize('tabActiveUnfocusedBorder', "Border on the bottom of an active tab in an unfocused group. Tabs are the containers for editors in the editor area. Multiple tabs can be opened in one editor group. There can be multiple editor groups."));
 
 export const TAB_ACTIVE_BORDER_TOP = registerColor('tab.activeBorderTop', {
-	dark: null,
+	dark: '#00D47E',
 	light: null,
 	hcDark: null,
 	hcLight: '#B5200D'
@@ -211,7 +211,7 @@ export const EDITOR_GROUP_FOCUSED_EMPTY_BORDER = registerColor('editorGroup.focu
 }, localize('editorGroupFocusedEmptyBorder', "Border color of an empty editor group that is focused. Editor groups are the containers of editors."));
 
 export const EDITOR_GROUP_HEADER_TABS_BACKGROUND = registerColor('editorGroupHeader.tabsBackground', {
-	dark: '#252526',
+	dark: '#0D1117',
 	light: '#F3F3F3',
 	hcDark: null,
 	hcLight: null
@@ -229,7 +229,7 @@ export const EDITOR_GROUP_HEADER_BORDER = registerColor('editorGroupHeader.borde
 }, localize('editorTitleContainerBorder', "Border color of the editor group title header. Editor groups are the containers of editors."));
 
 export const EDITOR_GROUP_BORDER = registerColor('editorGroup.border', {
-	dark: '#444444',
+	dark: '#2A3544',
 	light: '#E7E7E7',
 	hcDark: contrastBorder,
 	hcLight: contrastBorder
@@ -350,7 +350,7 @@ export const BANNER_ICON_FOREGROUND = registerColor('banner.iconForeground', edi
 // < --- Status --- >
 
 export const STATUS_BAR_FOREGROUND = registerColor('statusBar.foreground', {
-	dark: '#FFFFFF',
+	dark: '#6B7B8D',
 	light: '#FFFFFF',
 	hcDark: '#FFFFFF',
 	hcLight: editorForeground
@@ -359,14 +359,14 @@ export const STATUS_BAR_FOREGROUND = registerColor('statusBar.foreground', {
 export const STATUS_BAR_NO_FOLDER_FOREGROUND = registerColor('statusBar.noFolderForeground', STATUS_BAR_FOREGROUND, localize('statusBarNoFolderForeground', "Status bar foreground color when no folder is opened. The status bar is shown in the bottom of the window."));
 
 export const STATUS_BAR_BACKGROUND = registerColor('statusBar.background', {
-	dark: '#007ACC',
+	dark: '#0D1117',
 	light: '#007ACC',
 	hcDark: null,
 	hcLight: null,
 }, localize('statusBarBackground', "Status bar background color when a workspace or folder is opened. The status bar is shown in the bottom of the window."));
 
 export const STATUS_BAR_NO_FOLDER_BACKGROUND = registerColor('statusBar.noFolderBackground', {
-	dark: '#68217A',
+	dark: '#0D1117',
 	light: '#68217A',
 	hcDark: null,
 	hcLight: null,
@@ -461,14 +461,14 @@ export const STATUS_BAR_WARNING_ITEM_HOVER_BACKGROUND = registerColor('statusBar
 // < --- Activity Bar --- >
 
 export const ACTIVITY_BAR_BACKGROUND = registerColor('activityBar.background', {
-	dark: '#333333',
+	dark: '#0D1117',
 	light: '#2C2C2C',
 	hcDark: '#000000',
 	hcLight: '#FFFFFF'
 }, localize('activityBarBackground', "Activity bar background color. The activity bar is showing on the far left or right and allows to switch between views of the side bar."));
 
 export const ACTIVITY_BAR_FOREGROUND = registerColor('activityBar.foreground', {
-	dark: Color.white,
+	dark: Color.fromHex('#D4DDE8'),
 	light: Color.white,
 	hcDark: Color.white,
 	hcLight: editorForeground
@@ -489,7 +489,7 @@ export const ACTIVITY_BAR_BORDER = registerColor('activityBar.border', {
 }, localize('activityBarBorder', "Activity bar border color separating to the side bar. The activity bar is showing on the far left or right and allows to switch between views of the side bar."));
 
 export const ACTIVITY_BAR_ACTIVE_BORDER = registerColor('activityBar.activeBorder', {
-	dark: ACTIVITY_BAR_FOREGROUND,
+	dark: Color.fromHex('#00D47E'),
 	light: ACTIVITY_BAR_FOREGROUND,
 	hcDark: contrastBorder,
 	hcLight: contrastBorder
@@ -512,13 +512,13 @@ export const ACTIVITY_BAR_DRAG_AND_DROP_BORDER = registerColor('activityBar.drop
 }, localize('activityBarDragAndDropBorder', "Drag and drop feedback color for the activity bar items. The activity bar is showing on the far left or right and allows to switch between views of the side bar."));
 
 export const ACTIVITY_BAR_BADGE_BACKGROUND = registerColor('activityBarBadge.background', {
-	dark: '#007ACC',
+	dark: '#00D47E',
 	light: '#007ACC',
 	hcDark: '#000000',
 	hcLight: '#0F4A85'
 }, localize('activityBarBadgeBackground', "Activity notification badge background color. The activity bar is showing on the far left or right and allows to switch between views of the side bar."));
 
-export const ACTIVITY_BAR_BADGE_FOREGROUND = registerColor('activityBarBadge.foreground', Color.white, localize('activityBarBadgeForeground', "Activity notification badge foreground color. The activity bar is showing on the far left or right and allows to switch between views of the side bar."));
+export const ACTIVITY_BAR_BADGE_FOREGROUND = registerColor('activityBarBadge.foreground', { dark: Color.fromHex('#0D1117'), light: Color.white, hcDark: Color.white, hcLight: Color.white }, localize('activityBarBadgeForeground', "Activity notification badge foreground color. The activity bar is showing on the far left or right and allows to switch between views of the side bar."));
 
 export const ACTIVITY_BAR_TOP_FOREGROUND = registerColor('activityBarTop.foreground', {
 	dark: '#E7E7E7',
@@ -600,7 +600,7 @@ export const EXTENSION_BADGE_REMOTE_FOREGROUND = registerColor('extensionBadge.r
 // < --- Side Bar --- >
 
 export const SIDE_BAR_BACKGROUND = registerColor('sideBar.background', {
-	dark: '#252526',
+	dark: '#131920',
 	light: '#F3F3F3',
 	hcDark: '#000000',
 	hcLight: '#FFFFFF'
@@ -650,7 +650,7 @@ export const SIDE_BAR_STICKY_SCROLL_SHADOW = registerColor('sideBarStickyScroll.
 // < --- Title Bar --- >
 
 export const TITLE_BAR_ACTIVE_FOREGROUND = registerColor('titleBar.activeForeground', {
-	dark: '#CCCCCC',
+	dark: '#D4DDE8',
 	light: '#333333',
 	hcDark: '#FFFFFF',
 	hcLight: '#292929'
@@ -664,7 +664,7 @@ export const TITLE_BAR_INACTIVE_FOREGROUND = registerColor('titleBar.inactiveFor
 }, localize('titleBarInactiveForeground', "Title bar foreground when the window is inactive."));
 
 export const TITLE_BAR_ACTIVE_BACKGROUND = registerColor('titleBar.activeBackground', {
-	dark: '#3C3C3C',
+	dark: '#0D1117',
 	light: '#DDDDDD',
 	hcDark: '#000000',
 	hcLight: '#FFFFFF'
@@ -678,7 +678,7 @@ export const TITLE_BAR_INACTIVE_BACKGROUND = registerColor('titleBar.inactiveBac
 }, localize('titleBarInactiveBackground', "Title bar background when the window is inactive."));
 
 export const TITLE_BAR_BORDER = registerColor('titleBar.border', {
-	dark: null,
+	dark: '#2A3544',
 	light: null,
 	hcDark: contrastBorder,
 	hcLight: contrastBorder

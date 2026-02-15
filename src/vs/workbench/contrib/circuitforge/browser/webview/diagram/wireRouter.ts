@@ -7,16 +7,16 @@ import { WireConnection, WiringDiagram, BreadboardPlacement } from '../../../com
 import { BreadboardRenderer } from './breadboardRenderer.js';
 
 const WIRE_COLORS: Record<string, string> = {
-	red: '#ff3333',
-	black: '#333333',
-	blue: '#4488ff',
-	green: '#44bb44',
-	yellow: '#ffcc00',
-	orange: '#ff8800',
-	white: '#eeeeee',
-	purple: '#aa44ff',
-	gray: '#888888',
-	brown: '#885533',
+	red: '#FF4444',
+	black: '#555555',
+	blue: '#5599FF',
+	green: '#44CC55',
+	yellow: '#FFDD22',
+	orange: '#FF9922',
+	white: '#F0F0F0',
+	purple: '#BB55FF',
+	gray: '#999999',
+	brown: '#996644',
 };
 
 export class WireRouter {
@@ -37,6 +37,12 @@ export class WireRouter {
 		const label = `${connection.from.componentId}.${connection.from.pin} → ${connection.to.componentId}.${connection.to.pin} (${connection.signalType})`;
 
 		if (!fromPos || !toPos) {
+			if (!fromPos) {
+				console.warn(`[CircuitForge][Wires] Wire "${connection.id}": cannot resolve position for FROM "${connection.from.componentId}" (placement not found)`);
+			}
+			if (!toPos) {
+				console.warn(`[CircuitForge][Wires] Wire "${connection.id}": cannot resolve position for TO "${connection.to.componentId}" (placement not found)`);
+			}
 			return '';
 		}
 

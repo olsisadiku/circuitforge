@@ -68,15 +68,30 @@ export class ProjectInputPane extends ViewPane {
 		// Logo / header
 		const header = document.createElement('div');
 		header.style.textAlign = 'center';
-		header.style.padding = '8px 0';
-		header.innerHTML = `
-			<div style="font-size: 18px; font-weight: 600; color: var(--vscode-foreground);">
-				CircuitForge
-			</div>
-			<div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px;">
-				AI Hardware Design Studio
-			</div>
-		`;
+		header.style.padding = '16px 0 12px 0';
+		header.style.backgroundImage = 'radial-gradient(circle, #2A3544 1px, transparent 1px)';
+		header.style.backgroundSize = '16px 16px';
+		header.style.backgroundPosition = 'center';
+
+		const title = document.createElement('div');
+		title.style.fontSize = '20px';
+		title.style.fontWeight = '700';
+		title.style.color = '#00D47E';
+		title.style.fontFamily = "'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace";
+		title.style.letterSpacing = '0.5px';
+		title.textContent = 'CircuitForge';
+		header.appendChild(title);
+
+		const subtitle = document.createElement('div');
+		subtitle.style.fontSize = '11px';
+		subtitle.style.color = '#6B7B8D';
+		subtitle.style.marginTop = '4px';
+		subtitle.style.fontFamily = "'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace";
+		subtitle.style.letterSpacing = '1px';
+		subtitle.style.textTransform = 'uppercase';
+		subtitle.textContent = 'AI Hardware Design Studio';
+		header.appendChild(subtitle);
+
 		container.appendChild(header);
 
 		// Description
@@ -95,12 +110,15 @@ export class ProjectInputPane extends ViewPane {
 		this.textarea.style.width = '100%';
 		this.textarea.style.resize = 'vertical';
 		this.textarea.style.padding = '8px';
-		this.textarea.style.borderRadius = '4px';
-		this.textarea.style.border = '1px solid var(--vscode-input-border, #3c3c3c)';
-		this.textarea.style.background = 'var(--vscode-input-background)';
-		this.textarea.style.color = 'var(--vscode-input-foreground)';
-		this.textarea.style.fontFamily = 'var(--vscode-font-family)';
+		this.textarea.style.borderRadius = '6px';
+		this.textarea.style.border = '1px solid #2A3544';
+		this.textarea.style.background = '#1A2332';
+		this.textarea.style.color = '#D4DDE8';
+		this.textarea.style.fontFamily = "'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace";
 		this.textarea.style.fontSize = '12px';
+		this.textarea.style.transition = 'border-color 0.2s ease';
+		this.textarea.addEventListener('focus', () => { this.textarea.style.borderColor = '#00D47E'; });
+		this.textarea.addEventListener('blur', () => { this.textarea.style.borderColor = '#2A3544'; });
 		this.textarea.style.boxSizing = 'border-box';
 		container.appendChild(this.textarea);
 
@@ -110,18 +128,20 @@ export class ProjectInputPane extends ViewPane {
 		this.generateButton.style.width = '100%';
 		this.generateButton.style.padding = '8px 16px';
 		this.generateButton.style.border = 'none';
-		this.generateButton.style.borderRadius = '4px';
-		this.generateButton.style.background = 'var(--vscode-button-background)';
-		this.generateButton.style.color = 'var(--vscode-button-foreground)';
+		this.generateButton.style.borderRadius = '6px';
+		this.generateButton.style.background = '#00D47E';
+		this.generateButton.style.color = '#0D1117';
 		this.generateButton.style.cursor = 'pointer';
 		this.generateButton.style.fontSize = '13px';
-		this.generateButton.style.fontWeight = '500';
+		this.generateButton.style.fontWeight = '600';
+		this.generateButton.style.fontFamily = "'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace";
+		this.generateButton.style.transition = 'background 0.2s ease';
 		this.generateButton.addEventListener('click', () => this.onGenerate());
 		this.generateButton.addEventListener('mouseenter', () => {
-			this.generateButton.style.background = 'var(--vscode-button-hoverBackground)';
+			this.generateButton.style.background = '#00F08E';
 		});
 		this.generateButton.addEventListener('mouseleave', () => {
-			this.generateButton.style.background = 'var(--vscode-button-background)';
+			this.generateButton.style.background = '#00D47E';
 		});
 		container.appendChild(this.generateButton);
 
@@ -130,19 +150,39 @@ export class ProjectInputPane extends ViewPane {
 		this.spinner.style.display = 'none';
 		this.spinner.style.textAlign = 'center';
 		this.spinner.style.padding = '12px';
-		this.spinner.innerHTML = `
-			<div style="display: inline-block; width: 20px; height: 20px; border: 2px solid var(--vscode-descriptionForeground); border-top-color: var(--vscode-button-background); border-radius: 50%; animation: cf-spin 0.8s linear infinite;"></div>
-			<div style="margin-top: 8px; font-size: 12px; color: var(--vscode-descriptionForeground);">Generating hardware design...</div>
-			<style>@keyframes cf-spin { to { transform: rotate(360deg); } }</style>
-		`;
+
+		const spinnerCircle = document.createElement('div');
+		spinnerCircle.style.display = 'inline-block';
+		spinnerCircle.style.width = '20px';
+		spinnerCircle.style.height = '20px';
+		spinnerCircle.style.border = '2px solid #2A3544';
+		spinnerCircle.style.borderTopColor = '#00D47E';
+		spinnerCircle.style.borderRadius = '50%';
+		spinnerCircle.style.animation = 'cf-spin 0.8s linear infinite';
+		this.spinner.appendChild(spinnerCircle);
+
+		const spinnerText = document.createElement('div');
+		spinnerText.style.marginTop = '8px';
+		spinnerText.style.fontSize = '12px';
+		spinnerText.style.color = 'var(--vscode-descriptionForeground)';
+		spinnerText.textContent = 'Generating hardware design...';
+		this.spinner.appendChild(spinnerText);
+
+		// Inject keyframes via a style element
+		const style = document.createElement('style');
+		style.textContent = '@keyframes cf-spin { to { transform: rotate(360deg); } }';
+		this.spinner.appendChild(style);
+
 		container.appendChild(this.spinner);
 
 		// Quick examples
 		const examplesLabel = document.createElement('div');
-		examplesLabel.style.fontSize = '11px';
+		examplesLabel.style.fontSize = '10px';
 		examplesLabel.style.fontWeight = '600';
-		examplesLabel.style.color = 'var(--vscode-foreground)';
+		examplesLabel.style.color = '#6B7B8D';
 		examplesLabel.style.marginTop = '4px';
+		examplesLabel.style.textTransform = 'uppercase';
+		examplesLabel.style.letterSpacing = '1px';
 		examplesLabel.textContent = 'Quick Examples';
 		container.appendChild(examplesLabel);
 
@@ -161,38 +201,43 @@ export class ProjectInputPane extends ViewPane {
 			btn.style.width = '100%';
 			btn.style.padding = '6px 8px';
 			btn.style.margin = '4px 0';
-			btn.style.border = '1px solid var(--vscode-input-border, #3c3c3c)';
-			btn.style.borderRadius = '4px';
+			btn.style.border = '1px solid #2A3544';
+			btn.style.borderRadius = '6px';
 			btn.style.background = 'transparent';
-			btn.style.color = 'var(--vscode-textLink-foreground)';
+			btn.style.color = '#C78432';
 			btn.style.cursor = 'pointer';
 			btn.style.fontSize = '11px';
 			btn.style.textAlign = 'left';
+			btn.style.transition = 'background 0.15s ease, border-color 0.15s ease';
 			btn.addEventListener('click', () => {
 				this.textarea.value = example;
 				this.textarea.focus();
 			});
 			btn.addEventListener('mouseenter', () => {
-				btn.style.background = 'var(--vscode-list-hoverBackground)';
+				btn.style.background = '#1A2332';
+				btn.style.borderColor = '#C78432';
 			});
 			btn.addEventListener('mouseleave', () => {
 				btn.style.background = 'transparent';
+				btn.style.borderColor = '#2A3544';
 			});
 			container.appendChild(btn);
 		}
 
 		// History section
 		const historyLabel = document.createElement('div');
-		historyLabel.style.fontSize = '11px';
+		historyLabel.style.fontSize = '10px';
 		historyLabel.style.fontWeight = '600';
-		historyLabel.style.color = 'var(--vscode-foreground)';
+		historyLabel.style.color = '#6B7B8D';
 		historyLabel.style.marginTop = '12px';
+		historyLabel.style.textTransform = 'uppercase';
+		historyLabel.style.letterSpacing = '1px';
 		historyLabel.textContent = 'Recent Designs';
 		container.appendChild(historyLabel);
 
 		this.historyContainer = document.createElement('div');
 		this.historyContainer.style.fontSize = '11px';
-		this.historyContainer.style.color = 'var(--vscode-descriptionForeground)';
+		this.historyContainer.style.color = '#6B7B8D';
 		this.historyContainer.textContent = 'No designs yet. Generate your first project!';
 		container.appendChild(this.historyContainer);
 
@@ -207,23 +252,36 @@ export class ProjectInputPane extends ViewPane {
 	private async onGenerate(): Promise<void> {
 		const idea = this.textarea.value.trim();
 		if (!idea) {
+			console.warn('[CircuitForge][Input] Generate clicked with empty idea, ignoring');
 			return;
 		}
 
+		console.log(`[CircuitForge][Input] Starting generation for: "${idea}"`);
 		this.setLoading(true);
 
 		try {
+			console.log('[CircuitForge][Input] Calling AI service...');
 			const result = await this.hardwareAIService.generateFromIdea(idea);
+			console.log(`[CircuitForge][Input] AI returned: "${result.projectTitle}" — ${result.bom.length} BOM items, ${result.wiring.components.length} placements, ${result.wiring.connections.length} wires`);
+
 			// Enrich BOM with database data
+			console.log('[CircuitForge][Input] Enriching BOM with component database...');
 			result.bom = this.componentDatabaseService.enrichBOM(result.bom);
+
 			// Validate connections
+			console.log('[CircuitForge][Input] Validating connections...');
 			const validationWarnings = this.componentDatabaseService.validateConnections(result.wiring, result.bom);
 			result.warnings = [...result.warnings, ...validationWarnings];
+			if (result.warnings.length > 0) {
+				console.warn(`[CircuitForge][Input] ${result.warnings.length} warnings:`, result.warnings);
+			}
 
+			console.log('[CircuitForge][Input] Opening editor panels...');
 			await this.openResultPanels(result);
 			this.addToHistory(result.projectTitle);
-		} catch {
-			// Error notification handled by the service
+			console.log('[CircuitForge][Input] Generation complete');
+		} catch (err) {
+			console.error('[CircuitForge][Input] Generation failed:', err);
 		} finally {
 			this.setLoading(false);
 		}
@@ -257,8 +315,8 @@ export class ProjectInputPane extends ViewPane {
 	private addToHistory(title: string): void {
 		const entry = document.createElement('div');
 		entry.style.padding = '4px 0';
-		entry.style.borderBottom = '1px solid var(--vscode-input-border, #3c3c3c)';
-		entry.style.color = 'var(--vscode-textLink-foreground)';
+		entry.style.borderBottom = '1px solid #2A3544';
+		entry.style.color = '#C78432';
 		entry.style.cursor = 'pointer';
 		entry.style.fontSize = '11px';
 		entry.textContent = title;

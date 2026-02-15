@@ -23,6 +23,7 @@ export class BreadboardRenderer {
 		this.rows = wiring.boardRows;
 		this.cols = wiring.boardCols;
 		this.powerRails = wiring.powerRails;
+		console.log(`[CircuitForge][Board] Initialized: ${this.rows} rows, cols=[${this.cols.join(',')}], rails: +${this.powerRails.topPositive}/-${this.powerRails.topGround}`);
 	}
 
 	getBoardDimensions(): { width: number; height: number } {
@@ -37,7 +38,7 @@ export class BreadboardRenderer {
 		let svg = '';
 
 		// Board background
-		svg += `<rect x="0" y="0" width="${width}" height="${height}" rx="8" fill="#e8dcc8" />`;
+		svg += `<rect x="0" y="0" width="${width}" height="${height}" rx="8" fill="#F0E6D2" />`;
 
 		// Center gap
 		const leftCols = 5; // a-e
@@ -45,7 +46,7 @@ export class BreadboardRenderer {
 		const gapY = BOARD_PADDING + RAIL_HEIGHT * 2 + GAP_HEIGHT;
 		const gapW = GAP_HEIGHT;
 		const gapH = this.rows * HOLE_SPACING;
-		svg += `<rect x="${gapX - 2}" y="${gapY - 2}" width="${gapW + 4}" height="${gapH + 4}" rx="2" fill="#c4b8a0" />`;
+		svg += `<rect x="${gapX - 2}" y="${gapY - 2}" width="${gapW + 4}" height="${gapH + 4}" rx="2" fill="#D4C8B0" />`;
 
 		// Render holes
 		svg += this.renderHoles(gapX, gapY);
@@ -75,7 +76,7 @@ export class BreadboardRenderer {
 					x = gapX + GAP_HEIGHT + (colIdx - 5) * HOLE_SPACING;
 				}
 
-				svg += `<circle cx="${x}" cy="${y}" r="${HOLE_RADIUS}" fill="#333" stroke="#555" stroke-width="0.5" class="hole" data-row="${row + 1}" data-col="${this.cols[colIdx]}" />`;
+				svg += `<circle cx="${x}" cy="${y}" r="${HOLE_RADIUS}" fill="#2A2A2A" stroke="#4A4A4A" stroke-width="0.5" class="hole" data-row="${row + 1}" data-col="${this.cols[colIdx]}" />`;
 			}
 		}
 
@@ -88,7 +89,7 @@ export class BreadboardRenderer {
 		// Label every 5th row
 		for (let row = 0; row < this.rows; row += 5) {
 			const y = startY + row * HOLE_SPACING;
-			svg += `<text x="${BOARD_PADDING - LABEL_OFFSET}" y="${y + 4}" text-anchor="end" font-size="8" fill="#666" font-family="monospace">${row + 1}</text>`;
+			svg += `<text x="${BOARD_PADDING - LABEL_OFFSET}" y="${y + 4}" text-anchor="end" font-size="8" fill="#8A7A6A" font-family="monospace">${row + 1}</text>`;
 		}
 
 		return svg;
@@ -105,7 +106,7 @@ export class BreadboardRenderer {
 			} else {
 				x = gapX + GAP_HEIGHT + (colIdx - 5) * HOLE_SPACING;
 			}
-			svg += `<text x="${x}" y="${y}" text-anchor="middle" font-size="8" fill="#666" font-family="monospace">${this.cols[colIdx]}</text>`;
+			svg += `<text x="${x}" y="${y}" text-anchor="middle" font-size="8" fill="#8A7A6A" font-family="monospace">${this.cols[colIdx]}</text>`;
 		}
 
 		return svg;
@@ -121,36 +122,36 @@ export class BreadboardRenderer {
 
 		// Top positive rail
 		const topPosY = BOARD_PADDING;
-		svg += `<rect x="${railStartX}" y="${topPosY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#ffcccc" stroke="#cc0000" stroke-width="1" />`;
-		svg += `<text x="${railStartX + 4}" y="${topPosY + 14}" font-size="9" fill="#cc0000" font-weight="bold">+ ${this.powerRails.topPositive}</text>`;
+		svg += `<rect x="${railStartX}" y="${topPosY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#FFD4D4" stroke="#E83333" stroke-width="1" />`;
+		svg += `<text x="${railStartX + 4}" y="${topPosY + 14}" font-size="9" fill="#E83333" font-weight="bold">+ ${this.powerRails.topPositive}</text>`;
 		// Holes on positive rail
 		for (let i = 0; i < Math.floor(railWidth / HOLE_SPACING) - 1; i++) {
-			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${topPosY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#cc0000" opacity="0.4" />`;
+			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${topPosY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#E83333" opacity="0.4" />`;
 		}
 
 		// Top ground rail
 		const topGndY = topPosY + RAIL_HEIGHT + 2;
-		svg += `<rect x="${railStartX}" y="${topGndY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#ccccff" stroke="#0000cc" stroke-width="1" />`;
-		svg += `<text x="${railStartX + 4}" y="${topGndY + 14}" font-size="9" fill="#0000cc" font-weight="bold">- ${this.powerRails.topGround}</text>`;
+		svg += `<rect x="${railStartX}" y="${topGndY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#D4D4FF" stroke="#3355DD" stroke-width="1" />`;
+		svg += `<text x="${railStartX + 4}" y="${topGndY + 14}" font-size="9" fill="#3355DD" font-weight="bold">- ${this.powerRails.topGround}</text>`;
 		for (let i = 0; i < Math.floor(railWidth / HOLE_SPACING) - 1; i++) {
-			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${topGndY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#0000cc" opacity="0.4" />`;
+			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${topGndY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#3355DD" opacity="0.4" />`;
 		}
 
 		// Bottom power rails
 		const boardBottom = BOARD_PADDING + RAIL_HEIGHT * 2 + GAP_HEIGHT + this.rows * HOLE_SPACING + GAP_HEIGHT;
 
 		const botPosY = boardBottom;
-		svg += `<rect x="${railStartX}" y="${botPosY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#ffcccc" stroke="#cc0000" stroke-width="1" />`;
-		svg += `<text x="${railStartX + 4}" y="${botPosY + 14}" font-size="9" fill="#cc0000" font-weight="bold">+ ${this.powerRails.bottomPositive}</text>`;
+		svg += `<rect x="${railStartX}" y="${botPosY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#FFD4D4" stroke="#E83333" stroke-width="1" />`;
+		svg += `<text x="${railStartX + 4}" y="${botPosY + 14}" font-size="9" fill="#E83333" font-weight="bold">+ ${this.powerRails.bottomPositive}</text>`;
 		for (let i = 0; i < Math.floor(railWidth / HOLE_SPACING) - 1; i++) {
-			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${botPosY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#cc0000" opacity="0.4" />`;
+			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${botPosY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#E83333" opacity="0.4" />`;
 		}
 
 		const botGndY = botPosY + RAIL_HEIGHT + 2;
-		svg += `<rect x="${railStartX}" y="${botGndY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#ccccff" stroke="#0000cc" stroke-width="1" />`;
-		svg += `<text x="${railStartX + 4}" y="${botGndY + 14}" font-size="9" fill="#0000cc" font-weight="bold">- ${this.powerRails.bottomGround}</text>`;
+		svg += `<rect x="${railStartX}" y="${botGndY}" width="${railWidth}" height="${RAIL_HEIGHT}" rx="2" fill="#D4D4FF" stroke="#3355DD" stroke-width="1" />`;
+		svg += `<text x="${railStartX + 4}" y="${botGndY + 14}" font-size="9" fill="#3355DD" font-weight="bold">- ${this.powerRails.bottomGround}</text>`;
 		for (let i = 0; i < Math.floor(railWidth / HOLE_SPACING) - 1; i++) {
-			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${botGndY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#0000cc" opacity="0.4" />`;
+			svg += `<circle cx="${railStartX + 10 + i * HOLE_SPACING}" cy="${botGndY + RAIL_HEIGHT / 2}" r="${HOLE_RADIUS}" fill="#3355DD" opacity="0.4" />`;
 		}
 
 		return svg;

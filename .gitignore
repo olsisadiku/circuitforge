@@ -21,3 +21,8 @@ vscode.db
 product.overrides.json
 *.snap.actual
 .vscode-test
+
+# Local/generated artifacts
+plan-*.md
+SKILL.md
+run.sh
